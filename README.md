@@ -2193,6 +2193,101 @@ public class PalindromCheckSnippet {
   }
 }
 ```
+### Rabin-Karp Substring Search Algorithm
+
+```java
+public class RabinKarpSubstringSearchSnippet {
+
+    private static final int PRIME = 1_000_000_007; // Large prime to reduce collisions
+
+    /**
+     * Implements the Rabin-Karp algorithm to find the index of the first occurrence 
+     * of a substring in a given text.
+     *
+     * @param text The text in which the substring is to be searched.
+     * @param pattern The substring pattern to search for.
+     * @return The index of the first occurrence of the pattern in the text, 
+     *         or -1 if the pattern is not found.
+     */
+    public static int rabinKarpSearch(String text, String pattern) {
+        if (pattern == null || pattern.length() == 0) {
+            return 0; // Trivial case: empty pattern
+        }
+        if (text == null || text.length() < pattern.length()) {
+            return -1; // Pattern cannot be found
+        }
+
+        int m = pattern.length();
+        int n = text.length();
+        long patternHash = createHash(pattern, m);
+        long textHash = createHash(text, m);
+
+        for (int i = 0; i <= n - m; i++) {
+            if (patternHash == textHash && checkEqual(text, i, i + m - 1, pattern, 0, m - 1)) {
+                return i; // Match found
+            }
+            if (i < n - m) {
+                textHash = recalculateHash(text, i, i + m, textHash, m);
+            }
+        }
+        return -1; // No match found
+    }
+
+    /**
+     * Creates a hash for the given substring.
+     *
+     * @param str The string to hash.
+     * @param end The length of substring considered.
+     * @return The hash value.
+     */
+    private static long createHash(String str, int end) {
+        long hash = 0;
+        for (int i = 0; i < end; i++) {
+            hash += (long) str.charAt(i) * pow(PRIME, i);
+        }
+        return hash;
+    }
+
+    /**
+     * Recalculates hash by sliding the window by one character.
+     */
+    private static long recalculateHash(String str, int oldIndex, int newIndex, long oldHash, int patternLen) {
+        long newHash = oldHash - str.charAt(oldIndex);
+        newHash /= PRIME;
+        newHash += (long) str.charAt(newIndex) * pow(PRIME, patternLen - 1);
+        return newHash;
+    }
+
+    /**
+     * Checks if two substrings are equal.
+     */
+    private static boolean checkEqual(String str1, int start1, int end1, String str2, int start2, int end2) {
+        if (end1 - start1 != end2 - start2) {
+            return false;
+        }
+        while (start1 <= end1 && start2 <= end2) {
+            if (str1.charAt(start1) != str2.charAt(start2)) {
+                return false;
+            }
+            start1++;
+            start2++;
+        }
+        return true;
+    }
+
+    /**
+     * Efficient power function for modular hashing.
+     */
+    private static long pow(int base, int exp) {
+        long result = 1;
+        for (int i = 0; i < exp; i++) {
+            result *= base;
+        }
+        return result;
+    }
+}
+```
+
 
 ### Reverse String
 
